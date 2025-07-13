@@ -42,52 +42,65 @@ const CVCustomiser = () => {
         formData.append('logo', logoFile);
       }
 
-      // Mock API endpoint - replace with your actual endpoint
-      const response = await fetch('/api/generate-cv', {
-        method: 'POST',
-        body: formData
+      // Call your actual API endpoint
+      const response = await fetch('https://shiner-tender-virtually.ngrok-free.app/api/generate-cv', {
+          method: 'POST',
+          body: formData
       });
 
-      // Since this is a mock, we'll simulate the response
-      // In a real scenario, you'd handle the actual API response
       if (response.ok) {
-        // Mock successful response
         const result = await response.json();
-        setGeneratedPdfUrl(result.pdfUrl || '#mock-pdf-url');
-        setStatus({ 
-          type: 'success', 
-          message: 'CV generated successfully! You can now download it.' 
-        });
+        
+        if (result.success) {
+          console.log('CV generation successful:', result.data);
+          
+          // Si votre API retourne déjà un PDF URL
+          if (result.data.pdfUrl) {
+            setGeneratedPdfUrl(result.data.pdfUrl);
+            setStatus({ 
+              type: 'success', 
+              message: 'CV generated successfully! You can now download it.' 
+            });
+          } else {
+            // En attendant l'implémentation du PDF
+            setStatus({ 
+              type: 'success', 
+              message: `CV processing completed for "${result.data.jobTitle}". PDF generation will be implemented soon.` 
+            });
+          }
+        } else {
+          throw new Error(result.message || 'Server returned unsuccessful response');
+        }
       } else {
-        throw new Error('Failed to generate CV');
+        // Gestion des erreurs HTTP
+        let errorMessage = 'Failed to generate CV';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (parseError) {
+          // Si on ne peut pas parser la réponse d'erreur
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
-    } catch (error) {
-      // Mock the API call since endpoint doesn't exist yet
-      setTimeout(() => {
-        // Simulate successful generation
-        setGeneratedPdfUrl('#mock-pdf-url');
-        setStatus({ 
-          type: 'success', 
-          message: 'CV generated successfully! (Mock response - implement backend to get actual PDF)' 
-        });
-        setIsProcessing(false);
-      }, 2000);
-      return;
-    }
 
-    setIsProcessing(false);
+    } catch (error) {
+      console.error('Error generating CV:', error);
+      setStatus({ 
+        type: 'error', 
+        message: error.message || 'An error occurred while generating the CV.' 
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const downloadCV = () => {
     if (!generatedPdfUrl) return;
     
-    // In a real implementation, this would download the actual PDF
-    // For now, we'll just show an alert
-    alert('In a real implementation, this would download your customized CV PDF file.');
-    
-    // Real implementation would be something like:
-    // window.open(generatedPdfUrl, '_blank');
-    // or create a download link
+    // Use your network IP
+    const fullDownloadUrl = `https://shiner-tender-virtually.ngrok-free.app${generatedPdfUrl}`;
+    window.open(fullDownloadUrl, '_blank');
   };
 
   const resetForm = () => {
@@ -239,15 +252,6 @@ const CVCustomiser = () => {
                   <li>Click "Generate CV" to create a customized version</li>
                   <li>Download your personalized CV as a PDF</li>
                 </ol>
-              </div>
-
-              {/* API Info */}
-              <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                <h4 className="font-medium text-yellow-800 mb-2">Development Note:</h4>
-                <p className="text-sm text-yellow-700">
-                  Currently using mock API responses. Implement the <code className="bg-yellow-100 px-1 rounded">/api/generate-cv</code> endpoint 
-                  to handle the FormData with jobTitle and logo file, then return the generated PDF URL.
-                </p>
               </div>
             </div>
           </div>
