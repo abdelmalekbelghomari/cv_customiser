@@ -256,6 +256,10 @@ const CVCustomiser = () => {
             </div>
           </div>
         </div>
+        <div className="mt-8 text-center text-gray-500 text-sm">
+          <p>&copy; {new Date().getFullYear()} CV Customizer. All rights reserved.</p>
+          <p className="mt-1">Made with ❤️ by <a href="https://www.linkedin.com/in/abdelmalek-belghomari/">Abdelmalek Belghomari</a></p>
+        </div>
       </div>
     </div>
   );

@@ -181,11 +181,11 @@ export default function WebsiteLogin() {
             </button>
           </div>
         </div>
-
-        {/* Integration Note */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Connected to Firestore Database</p>
-        </div>
+        {/* Footer */}
+        <div className="mt-8 text-center text-gray-500 text-sm">
+          <p>&copy; {new Date().getFullYear()} CV Customizer. All rights reserved.</p>
+          <p className="mt-1">Made with ❤️ by <a href="https://www.linkedin.com/in/abdelmalek-belghomari/">Abdelmalek Belghomari</a></p>
+        </div>    
       </div>
     </div>
   );
